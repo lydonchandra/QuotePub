@@ -10,7 +10,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 public class Publisher {
-	public void publishQuote(final String symbol, String price) {
+	public void publishQuote(final String symbol, final String price) {
 		jmsTemplate.send( 
 				destination,
 				new MessageCreator() {
@@ -20,6 +20,7 @@ public class Publisher {
 						sb.append("<updates>");
 						sb.append("<update>");
 						sb.append("<symbol>"+ symbol +"</symbol>" );
+						sb.append("<price>" + price + "</price>");
 						sb.append("<datetime>2006-09-20T13:59:25.993-04:00</datetime>" );
 						sb.append("</update>");
 						sb.append("</updates>");

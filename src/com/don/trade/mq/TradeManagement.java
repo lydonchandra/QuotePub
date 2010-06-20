@@ -11,7 +11,7 @@ import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
-public class TradeManagement extends NotificationBroadcasterSupport implements TradeManagementBean {
+public class TradeManagement extends NotificationBroadcasterSupport implements TradeManagementMBean {
 	private long seqNo = 0;
 	private String name;
 	private ObjectName objName;

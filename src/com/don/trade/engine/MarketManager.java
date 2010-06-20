@@ -1,19 +1,23 @@
 package com.don.trade.engine;
 
+import static java.lang.System.out;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.naming.Context;
-import javax.naming.InitialContext;
+
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class MarketManager implements Runnable, MessageListener {
 	
@@ -22,7 +26,7 @@ public class MarketManager implements Runnable, MessageListener {
 	private static final String PRICE_TAG = "<price>";
 	private static final String PRICE_END_TAG = "</price>";
 	
-	private boolean fDebug = false;
+	private boolean fDebug = true;
 	
 	private Connection connection = null;
 	private Session session = null;
@@ -30,8 +34,9 @@ public class MarketManager implements Runnable, MessageListener {
 	private MessageConsumer consumer = null;
 	
 	public static final int INITIAL_CAPACITY = 111;
-	Map<String, StringBuffer> marketBook = new HashMap<String,StringBuffer>(INITIAL_CAPACITY);
-	
+	public Map<String, StringBuffer> marketBook = new HashMap<String,StringBuffer>(INITIAL_CAPACITY);
+	Map donmap = new HashMap();
+	       
 	public MarketManager() {
 	}
 	
@@ -46,18 +51,18 @@ public class MarketManager implements Runnable, MessageListener {
 		}
 	}
 	
-	private void setupJMS(String destinationName) throws Exception {
-		Context jndiContext = new InitialContext();
-		ConnectionFactory connectionFactory = (ConnectionFactory)jndiContext.lookup("jms/ConnectionFactory");
-		destination = (Destination)jndiContext.lookup(destinationName);
-		jndiContext.close();
-		
-		connection = connectionFactory.createConnection();
-		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		consumer = session.createConsumer(destination);
-		consumer.setMessageListener( this );
-		connection.start();
-	}
+//	private void setupJMS(String destinationName) throws Exception {
+//		Context jndiContext = new InitialContext();
+//		ConnectionFactory connectionFactory = (ConnectionFactory)jndiContext.lookup("jms/ConnectionFactory");
+//		destination = (Destination)jndiContext.lookup(destinationName);
+//		jndiContext.close();
+//		
+//		connection = connectionFactory.createConnection();
+//		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+//		consumer = session.createConsumer(destination);
+//		consumer.setMessageListener( this );
+//		connection.start();
+//	}
 	
 	public void displayMarketBook() {
 		System.out.println("************************************************");
@@ -82,7 +87,12 @@ public class MarketManager implements Runnable, MessageListener {
 	@Override
 	public void run() {
 		try {
-			setupJMS("jms/QuoteUpdates");
+			//setupJMS("jms/QuoteUpdates");
+			final BeanFactory factory = new XmlBeanFactory(new FileSystemResource("/Users/lydonchandra/Documents/workspace-sts-carbon/QuotePub/src/com/don/donjms.xml"));
+			//Publisher publisher = (Publisher)factory.getBean("publisher");
+			DefaultMessageListenerContainer ml = (DefaultMessageListenerContainer)factory.getBean("jmsContainer2");
+			ml.start();
+			marketBook.put("a", new StringBuffer().append("aaaaaa"));
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
@@ -141,7 +151,7 @@ public class MarketManager implements Runnable, MessageListener {
 			sbPrice = new StringBuffer(15);
 			marketBook.put(symbol, sbPrice);
 		}
-		
+		out.println("MarketBook " + marketBook.toString() + " size:" + marketBook.size());
 		sbPrice.replace(0, price.length(), price);
 	}
 	

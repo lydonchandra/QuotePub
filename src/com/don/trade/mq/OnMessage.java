@@ -11,7 +11,7 @@ import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
-public class OnMessage extends NotificationBroadcasterSupport implements OnMessageBean {
+public class OnMessage extends NotificationBroadcasterSupport implements OnMessageMBean {
 	private long totalCalls;
 	private long totalNano;
 	private long lastCallNano;

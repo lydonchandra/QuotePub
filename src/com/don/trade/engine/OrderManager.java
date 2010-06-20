@@ -15,6 +15,8 @@ import com.don.trade.mq.OnMessage;
 import com.don.trade.mq.TradeManagement;
 import com.don.trade.util.ISO8601DateFormat;
 
+
+
 public class OrderManager implements Runnable {
 
 	private static final String TRADES_TAG = "<trades>";
@@ -42,7 +44,7 @@ public class OrderManager implements Runnable {
 	private static final int MAX_TRADE_XML_SIZE = 512;
 	private StringBuffer tradeXML = new StringBuffer(MAX_TRADE_XML_SIZE);
 	
-	private MarketManager marketMgr = null;
+	MarketManager marketMgr = null;
 	private TradeManagement tradeMgr = null;
 	private OnMessage onMessage = new OnMessage("OrderManager");
 	
@@ -56,12 +58,13 @@ public class OrderManager implements Runnable {
 	
 	StringBuffer[] orderBookKeys = null;
 	
-	public OrderManager(MarketManager marketMgr) throws Exception {
-		this.marketMgr = marketMgr;
+	
+	public OrderManager(MarketManager marketMgr2) throws Exception {
+		this.marketMgr = marketMgr2;
 		this.tradeMgr = new TradeManagement("LimitStopTrades");
-		
+	
 		try {
-			File file = new File("orders.csv");
+			File file = new File("/Users/lydonchandra/Documents/workspace-sts-carbon/QuotePub/src/com/don/trade/engine/orders.csv");
 			FileReader fr = new FileReader(file);
 			BufferedReader reader = new BufferedReader(fr);
 			
@@ -256,11 +259,13 @@ public class OrderManager implements Runnable {
 		return tradeXML;
 	}
 	public void run() {
+		System.out.println("marketMgr.donmap.size " + marketMgr.donmap.size());
 		try { 
 			long startTime = onMessage.startCall();
 			while( true ) {
 				getOrderBookKeys();
 				for( int i = 0; i < orderBookKeys.length; i++ ) {
+					System.out.println(marketMgr.marketBook.size());
 					StringBuffer symbol = orderBookKeys[i];
 					StringBuffer sPrice = marketMgr.marketBook.get(symbol);
 					if( sPrice == null || sPrice.length() == 0) 
@@ -285,7 +290,7 @@ public class OrderManager implements Runnable {
 				onMessage.endCall( startTime);
 				startTime = onMessage.startCall();
 				//RealtimeThread.waitForNextPeriod();
-				Thread.sleep(1);
+				//Thread.sleep(100);
 			}
 		} catch (Exception e ) {
 			

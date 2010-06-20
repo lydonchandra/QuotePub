@@ -13,9 +13,6 @@ import javax.jms.JMSException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 
 public class QuotePub {
@@ -24,21 +21,22 @@ public class QuotePub {
 		
 		ExecutorService exec = Executors.newFixedThreadPool(2);
 		
-		exec.execute(new Runnable() {
-			@Override
-			public void run() {
-				DefaultMessageListenerContainer ml = (DefaultMessageListenerContainer)factory.getBean("jmsContainer");
-				ml.start();
-			}
-		});
+//		exec.execute(new Runnable() {
+//			@Override
+//			public void run() {
+//				DefaultMessageListenerContainer ml = (DefaultMessageListenerContainer)factory.getBean("jmsContainer");
+//				ml.start();
+//			}
+//		});
 		
-		TimeUnit.SECONDS.sleep(2);
+//		TimeUnit.SECONDS.sleep(2);
 		
 		exec.execute(new Runnable() {
 			@Override
 			public void run() {
 				Publisher publisher = (Publisher)factory.getBean("publisher");
-				File file = new File("/Users/lydonchandra/Downloads/QuotePublisher/datafeed.csv");
+//				File file = new File("/Users/lydonchandra/Downloads/QuotePublisher/datafeed.csv");
+				File file = new File("/Users/lydonchandra/java/stock/datafeeddon.csv");
 				FileReader fr;
 				try {
 					fr = new FileReader(file);
