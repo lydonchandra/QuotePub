@@ -10,10 +10,40 @@ import java.util.List;
 
 public class StockDistribution {
     public static void main(String [] args ) throws ClassNotFoundException, SQLException {
+//        Class.forName("com.mysql.jdbc.Driver");
+//        String db = "stock5";
+//        String url = "jdbc:mysql://localhost:3306/" + db;
+//        Connection conn = java.sql.DriverManager.getConnection(url, "root", "");
+//        Statement stat = conn.createStatement();
+//
+//        ResultSet rs = stat.executeQuery("select table_name from information_schema.tables where table_schema = '" + db + "'");
+//        // store all stock names in arrStock, so we can use it later to calculate the EV
+//        List<String> arrStock = new ArrayList<String>();
+//
+//        while( rs.next() ) {
+//           String tableName = rs.getString("table_name");
+//           arrStock.add(tableName);
+//        }
+    	StockDistribution stockDist = new StockDistribution();
+    	List<String> arrStock = stockDist.getAllSymbols("stock5");
+        String theDate = "07-May-2010";        
+        for( int idx=0; idx< arrStock.size(); idx++ ) {
+            stockDist.popEv( arrStock.get(idx), theDate); 
+        }
+    }
+    
+    public void calculateAllEv(String db, String theDate) throws ClassNotFoundException, SQLException {
+    	List<String> stocks = getAllSymbols(db);
+    	for( int idx=0; idx< stocks.size(); idx++ ) {
+            popEv( stocks.get(idx), theDate); 
+        }    	
+    }
+    
+    public List<String> getAllSymbols(String db) throws ClassNotFoundException, SQLException {
+    	
         Class.forName("com.mysql.jdbc.Driver");
-        String db = "stock5";
-        String url = "jdbc:mysql://localhost:3306/" + db;
-        Connection conn = java.sql.DriverManager.getConnection(url, "root", "");
+        String url = MyConstants.DATABASE_JDBC + db;
+        Connection conn = java.sql.DriverManager.getConnection(url, MyConstants.DB_USERNAME, MyConstants.DB_PASS);
         Statement stat = conn.createStatement();
 
         ResultSet rs = stat.executeQuery("select table_name from information_schema.tables where table_schema = '" + db + "'");
@@ -24,12 +54,8 @@ public class StockDistribution {
            String tableName = rs.getString("table_name");
            arrStock.add(tableName);
         }
-
-        String theDate = "07-May-2010";
-        StockDistribution stockDist = new StockDistribution();
-        for( int idx=0; idx< arrStock.size(); idx++ ) {
-            stockDist.popEv( arrStock.get(idx), theDate); 
-        }
+        
+        return arrStock;    	
     }
 
     public String popEvCore(double prevClose, String symbol, double open, double high, double low, double close, long vol) {
